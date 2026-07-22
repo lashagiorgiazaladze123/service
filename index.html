@@ -1,0 +1,562 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>UnitechService — Repairs / შეკეთება</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Inter:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#030712;
+    --bg-elevated:#0B121F;
+    --bg-panel:#0F1729;
+    --border:rgba(255,255,255,0.08);
+    --border-bright:rgba(34,211,238,0.35);
+    --cyan:#22D3EE;
+    --cyan-dim:rgba(34,211,238,0.15);
+    --amber:#F5A623;
+    --text:#E8ECF1;
+    --text-muted:#8B96A8;
+    --text-faint:#5B6478;
+    --crack:#F5576C;
+  }
+  *{margin:0;padding:0;box-sizing:border-box;}
+  html{scroll-behavior:smooth;}
+  body{
+    background:var(--bg);
+    color:var(--text);
+    font-family:'Inter',sans-serif;
+    line-height:1.5;
+    overflow-x:hidden;
+  }
+  @media (prefers-reduced-motion: reduce){
+    *{animation-duration:0.01ms !important; animation-iteration-count:1 !important; transition-duration:0.01ms !important;}
+  }
+  h1,h2,h3{font-family:'Space Grotesk',sans-serif;}
+  .mono{font-family:'IBM Plex Mono',monospace;}
+  a{color:inherit;text-decoration:none;}
+  button{font-family:inherit;cursor:pointer;}
+  .ka{color:var(--text-muted); font-weight:400;}
+ 
+  /* ---------- layout helpers ---------- */
+  .wrap{max-width:1120px;margin:0 auto;padding:0 24px;}
+  section{padding:96px 0;}
+  @media (max-width:640px){ section{padding:64px 0;} }
+ 
+  .eyebrow{
+    font-family:'IBM Plex Mono',monospace;
+    font-size:12px;
+    letter-spacing:0.12em;
+    text-transform:uppercase;
+    color:var(--cyan);
+    display:flex; align-items:center; gap:10px;
+    margin-bottom:16px;
+  }
+  .eyebrow::before{
+    content:"";
+    width:8px;height:8px;border-radius:50%;
+    background:var(--cyan);
+    box-shadow:0 0 8px var(--cyan);
+  }
+ 
+  /* ---------- nav ---------- */
+  header{
+    position:sticky; top:0; z-index:50;
+    background:rgba(3,7,18,0.85);
+    backdrop-filter:blur(10px);
+    border-bottom:1px solid var(--border);
+  }
+  nav{
+    max-width:1120px;margin:0 auto;padding:18px 24px;
+    display:flex; align-items:center; justify-content:space-between;
+  }
+  .logo{
+    font-family:'Space Grotesk',sans-serif;
+    font-weight:700; font-size:19px;
+    display:flex; align-items:center; gap:10px;
+  }
+  .logo-mark{
+    width:28px;height:28px;
+    border:1.5px solid var(--cyan);
+    border-radius:7px;
+    display:flex;align-items:center;justify-content:center;
+    position:relative;
+  }
+  .logo-mark::after{
+    content:"";
+    width:10px;height:10px;
+    border:1.5px solid var(--cyan);
+    border-radius:2px;
+  }
+  .nav-links{display:flex; gap:32px; font-size:14px; color:var(--text-muted);}
+  .nav-links a:hover{color:var(--cyan);}
+  .nav-cta{
+    background:var(--cyan); color:var(--bg);
+    padding:9px 18px; border-radius:8px;
+    font-weight:600; font-size:14px;
+    white-space:nowrap;
+  }
+  @media (max-width:760px){ .nav-links{display:none;} }
+ 
+  /* ---------- hero ---------- */
+  .hero{
+    padding:80px 0 60px;
+    display:grid; grid-template-columns:1.1fr 0.9fr; gap:48px; align-items:center;
+  }
+  @media (max-width:900px){ .hero{grid-template-columns:1fr; padding:48px 0 20px;} }
+  .hero h1{
+    font-size:clamp(34px,5vw,54px);
+    line-height:1.08;
+    font-weight:700;
+    letter-spacing:-0.01em;
+  }
+  .hero h1 .accent{color:var(--cyan);}
+  .hero-sub{
+    margin-top:20px; font-size:17px; color:var(--text-muted); max-width:460px;
+  }
+  .hero-sub .ka-line{display:block; margin-top:6px; font-size:15px;}
+  .hero-ctas{display:flex; gap:14px; margin-top:32px; flex-wrap:wrap;}
+  .btn-primary{
+    background:var(--amber); color:#1A1200;
+    padding:14px 24px; border-radius:9px; font-weight:600; font-size:15px;
+    border:none;
+    box-shadow:0 0 0 0 rgba(245,166,35,0.5);
+    transition:transform .15s ease, box-shadow .15s ease;
+  }
+  .btn-primary:hover{transform:translateY(-1px); box-shadow:0 6px 20px rgba(245,166,35,0.25);}
+  .btn-secondary{
+    border:1px solid var(--border); color:var(--text);
+    padding:14px 24px; border-radius:9px; font-weight:500; font-size:15px;
+    transition:border-color .15s ease, background .15s ease;
+  }
+  .btn-secondary:hover{border-color:var(--border-bright); background:var(--cyan-dim);}
+ 
+  .trust-row{
+    display:flex; gap:28px; margin-top:40px; flex-wrap:wrap;
+    font-size:13px; color:var(--text-faint);
+  }
+  .trust-row span{display:flex; align-items:center; gap:7px;}
+  .trust-row svg{width:15px;height:15px; stroke:var(--cyan); flex-shrink:0;}
+ 
+  /* ---------- signature: scanning phone ---------- */
+  .scan-stage{
+    position:relative; display:flex; justify-content:center; align-items:center;
+    height:440px;
+  }
+  .phone-shell{
+    position:relative; width:190px; height:390px;
+    border-radius:26px;
+    background:var(--bg-elevated);
+    border:2px solid var(--border);
+    overflow:hidden;
+    box-shadow:0 40px 80px -20px rgba(0,0,0,0.6);
+  }
+  .phone-notch{
+    position:absolute; top:0; left:50%; transform:translateX(-50%);
+    width:70px; height:16px; background:var(--bg);
+    border-radius:0 0 10px 10px; z-index:5;
+  }
+  .phone-screen{
+    position:absolute; inset:10px; border-radius:18px;
+    background:linear-gradient(160deg,#0B1220,#050810);
+    overflow:hidden;
+  }
+  /* cracked layer */
+  .crack-layer{
+    position:absolute; inset:0;
+    background:linear-gradient(160deg,#0B1220,#050810);
+  }
+  .crack-layer svg{position:absolute; inset:0; width:100%; height:100%;}
+  /* fixed layer revealed by scan */
+  .fixed-layer{
+    position:absolute; inset:0;
+    background:linear-gradient(160deg,#0E1B2E,#081120);
+    clip-path: inset(0 0 100% 0);
+    animation: revealFix 3.2s ease-in-out infinite;
+  }
+  .fixed-layer .glow-grid{
+    position:absolute; inset:0;
+    background-image:
+      linear-gradient(rgba(34,211,238,0.10) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(34,211,238,0.10) 1px, transparent 1px);
+    background-size:20px 20px;
+  }
+  .fixed-layer .checkmark{
+    position:absolute; top:50%; left:50%; transform:translate(-50%,-58%);
+    width:46px; height:46px;
+  }
+  .scan-line{
+    position:absolute; left:0; right:0; height:2px;
+    background:linear-gradient(90deg, transparent, var(--cyan), transparent);
+    box-shadow:0 0 16px 3px var(--cyan);
+    animation: scanMove 3.2s ease-in-out infinite;
+  }
+  @keyframes scanMove{
+    0%{ top:0%; }
+    50%{ top:100%; }
+    50.01%{ top:0%; }
+    100%{ top:0%; }
+  }
+  @keyframes revealFix{
+    0%{ clip-path: inset(0 0 100% 0); }
+    50%{ clip-path: inset(0 0 0% 0); }
+    50.01%{ clip-path: inset(0 0 100% 0); }
+    100%{ clip-path: inset(0 0 100% 0); }
+  }
+  .scan-caption{
+    position:absolute; bottom:-38px; left:50%; transform:translateX(-50%);
+    font-family:'IBM Plex Mono',monospace; font-size:11px; color:var(--text-faint);
+    letter-spacing:0.08em; white-space:nowrap;
+  }
+ 
+  /* ---------- section headers ---------- */
+  .section-head{margin-bottom:44px; max-width:560px;}
+  .section-head h2{font-size:clamp(24px,3vw,32px); font-weight:600;}
+  .section-head p{color:var(--text-muted); margin-top:10px; font-size:15px;}
+ 
+  /* ---------- what we fix grid ---------- */
+  .fix-grid{
+    display:grid; grid-template-columns:repeat(5,1fr); gap:1px;
+    background:var(--border); border:1px solid var(--border); border-radius:14px; overflow:hidden;
+  }
+  @media (max-width:900px){ .fix-grid{grid-template-columns:repeat(3,1fr);} }
+  @media (max-width:560px){ .fix-grid{grid-template-columns:repeat(2,1fr);} }
+  .fix-item{
+    background:var(--bg-panel);
+    padding:28px 16px;
+    display:flex; flex-direction:column; align-items:center; gap:12px; text-align:center;
+    transition:background .15s ease;
+  }
+  .fix-item:hover{background:var(--bg-elevated);}
+  .fix-item svg{width:28px; height:28px; stroke:var(--cyan);}
+  .fix-item .en{font-size:13.5px; font-weight:500;}
+  .fix-item .ka{font-size:12px;}
+ 
+  /* ---------- services list ---------- */
+  .services-list{display:flex; flex-direction:column; border-top:1px solid var(--border);}
+  .service-row{
+    display:flex; align-items:center; justify-content:space-between;
+    padding:22px 4px; border-bottom:1px solid var(--border);
+    gap:20px;
+  }
+  .service-row .left{display:flex; align-items:center; gap:16px;}
+  .service-row svg{width:20px;height:20px; stroke:var(--amber); flex-shrink:0;}
+  .service-row .num{font-family:'IBM Plex Mono',monospace; font-size:12px; color:var(--text-faint); width:22px;}
+  .service-row .en{font-size:15.5px; font-weight:500;}
+  .service-row .ka{font-size:13px; margin-top:2px;}
+ 
+  /* ---------- price checker ---------- */
+  .checker{
+    background:var(--bg-panel); border:1px solid var(--border); border-radius:16px;
+    padding:36px; position:relative; overflow:hidden;
+  }
+  .checker::before{
+    content:""; position:absolute; top:0; left:0; right:0; height:2px;
+    background:linear-gradient(90deg, transparent, var(--cyan), transparent);
+  }
+  .checker-grid{display:grid; grid-template-columns:repeat(3,1fr); gap:16px; margin-bottom:22px;}
+  @media (max-width:700px){ .checker-grid{grid-template-columns:1fr;} }
+  .field label{
+    display:block; font-family:'IBM Plex Mono',monospace; font-size:11px;
+    color:var(--text-faint); letter-spacing:0.06em; text-transform:uppercase; margin-bottom:8px;
+  }
+  .field select{
+    width:100%; background:var(--bg-elevated); border:1px solid var(--border);
+    color:var(--text); padding:12px 14px; border-radius:8px; font-size:14px;
+    font-family:'Inter',sans-serif;
+    appearance:none;
+  }
+  .field select:focus{outline:2px solid var(--cyan); outline-offset:1px;}
+  .price-result{
+    display:flex; gap:32px; align-items:baseline; flex-wrap:wrap;
+    padding-top:18px; border-top:1px solid var(--border);
+  }
+  .price-result .label{font-size:12px; color:var(--text-faint); font-family:'IBM Plex Mono',monospace; text-transform:uppercase; letter-spacing:0.06em; margin-bottom:4px;}
+  .price-result .val{font-family:'IBM Plex Mono',monospace; font-size:22px; font-weight:500; color:var(--cyan);}
+  .price-note{margin-top:20px; font-size:13px; color:var(--text-faint);}
+ 
+  /* ---------- about ---------- */
+  .about{
+    display:grid; grid-template-columns:1fr 1fr; gap:56px; align-items:center;
+  }
+  @media (max-width:860px){ .about{grid-template-columns:1fr;} }
+  .about-badges{display:flex; flex-direction:column; gap:18px;}
+  .badge{
+    display:flex; gap:16px; align-items:flex-start;
+    padding:18px; border:1px solid var(--border); border-radius:12px; background:var(--bg-panel);
+  }
+  .badge svg{width:22px;height:22px; stroke:var(--cyan); flex-shrink:0; margin-top:2px;}
+  .badge .t{font-weight:600; font-size:14.5px;}
+  .badge .d{font-size:13px; color:var(--text-muted); margin-top:3px;}
+ 
+  /* ---------- contact ---------- */
+  .contact-card{
+    background:var(--bg-panel); border:1px solid var(--border); border-radius:16px;
+    padding:40px; display:grid; grid-template-columns:1fr 1fr; gap:32px;
+  }
+  @media (max-width:700px){ .contact-card{grid-template-columns:1fr;} }
+  .contact-item{display:flex; gap:14px; align-items:flex-start; margin-bottom:22px;}
+  .contact-item svg{width:19px;height:19px; stroke:var(--cyan); margin-top:2px; flex-shrink:0;}
+  .contact-item .t{font-size:14px; color:var(--text-faint); text-transform:uppercase; letter-spacing:0.05em; font-family:'IBM Plex Mono',monospace; margin-bottom:3px;}
+  .contact-item .v{font-size:15.5px;}
+  .contact-item a:hover{color:var(--cyan);}
+ 
+  footer{
+    border-top:1px solid var(--border); padding:32px 0; text-align:center;
+    font-size:13px; color:var(--text-faint);
+  }
+</style>
+</head>
+<body>
+ 
+<header>
+  <nav>
+    <div class="logo"><span class="logo-mark"></span>UnitechService</div>
+    <div class="nav-links">
+      <a href="#fix">What We Fix</a>
+      <a href="#services">Services</a>
+      <a href="#prices">Prices</a>
+      <a href="#about">About</a>
+      <a href="#contact">Contact</a>
+    </div>
+    <a class="nav-cta" href="tel:+995597882088">Call Now</a>
+  </nav>
+</header>
+ 
+<section class="wrap hero">
+  <div>
+    <div class="eyebrow">Diagnostics in minutes, not days</div>
+    <h1>Your device,<br><span class="accent">fixed right.</span></h1>
+    <p class="hero-sub">
+      Trusted repairs for phones, tablets, laptops and drones — every replaced part backed by warranty.
+      <span class="ka-line">სანდო და პროფესიონალური მომსახურება. გარანტია ყველა შეცვლილ დეტალზე.</span>
+    </p>
+    <div class="hero-ctas">
+      <a href="#prices" class="btn-primary">Check a Price</a>
+      <a href="tel:+995597882088" class="btn-secondary">Book a Visit</a>
+    </div>
+    <div class="trust-row">
+      <span><svg viewBox="0 0 24 24" fill="none" stroke-width="2"><path d="M9 12l2 2 4-4"/><circle cx="12" cy="12" r="10"/></svg>Warranty on every part</span>
+      <span><svg viewBox="0 0 24 24" fill="none" stroke-width="2"><path d="M12 6v6l4 2"/><circle cx="12" cy="12" r="10"/></svg>Most repairs same-day</span>
+      <span><svg viewBox="0 0 24 24" fill="none" stroke-width="2"><path d="M20 6L9 17l-5-5"/></svg>Original & budget parts</span>
+    </div>
+  </div>
+ 
+  <div class="scan-stage">
+    <div class="phone-shell">
+      <div class="phone-notch"></div>
+      <div class="phone-screen">
+        <div class="crack-layer">
+          <svg viewBox="0 0 170 370" fill="none">
+            <path d="M85 40 L60 110 L95 150 L40 210 L100 240 L70 320" stroke="#F5576C" stroke-width="1.4" opacity="0.55"/>
+            <path d="M85 40 L120 95 L75 140 L130 190 L90 250" stroke="#F5576C" stroke-width="1" opacity="0.4"/>
+          </svg>
+        </div>
+        <div class="fixed-layer">
+          <div class="glow-grid"></div>
+          <svg class="checkmark" viewBox="0 0 24 24" fill="none" stroke="#22D3EE" stroke-width="2">
+            <circle cx="12" cy="12" r="10" opacity="0.25"/>
+            <path d="M8 12.5l2.5 2.5L16 9"/>
+          </svg>
+        </div>
+        <div class="scan-line"></div>
+      </div>
+    </div>
+    <div class="scan-caption">// diagnostics running</div>
+  </div>
+</section>
+ 
+<section id="fix" class="wrap">
+  <div class="section-head">
+    <div class="eyebrow">Coverage</div>
+    <h2>What we fix</h2>
+    <p>If it has a circuit board, chances are we can bring it back to life.</p>
+  </div>
+  <div class="fix-grid">
+    <div class="fix-item">
+      <svg viewBox="0 0 24 24" fill="none" stroke-width="1.6"><rect x="7" y="2" width="10" height="20" rx="2"/><path d="M11 18h2"/></svg>
+      <div><div class="en">Smartphones</div><div class="ka">Apple, Samsung, Android</div></div>
+    </div>
+    <div class="fix-item">
+      <svg viewBox="0 0 24 24" fill="none" stroke-width="1.6"><path d="M12 3v4M5 8l-2-2M19 8l2-2M12 8a6 6 0 016 6c0 3-2 4-2 6H8c0-2-2-3-2-6a6 6 0 016-6z"/></svg>
+      <div><div class="en">Drones</div><div class="ka">დრონები</div></div>
+    </div>
+    <div class="fix-item">
+      <svg viewBox="0 0 24 24" fill="none" stroke-width="1.6"><rect x="3" y="4" width="18" height="14" rx="2"/><path d="M10 20h4"/></svg>
+      <div><div class="en">iPads / Tablets</div><div class="ka">ტაბლეტები</div></div>
+    </div>
+    <div class="fix-item">
+      <svg viewBox="0 0 24 24" fill="none" stroke-width="1.6"><rect x="3" y="4" width="18" height="12" rx="1.5"/><path d="M2 19h20"/></svg>
+      <div><div class="en">Laptops</div><div class="ka">ლეპტოპები</div></div>
+    </div>
+    <div class="fix-item">
+      <svg viewBox="0 0 24 24" fill="none" stroke-width="1.6"><rect x="3" y="7" width="18" height="10" rx="2"/><circle cx="8" cy="12" r="1.3" fill="currentColor" stroke="none"/><path d="M13 12h5"/></svg>
+      <div><div class="en">Car Audio</div><div class="ka">მანქანის აუდიო</div></div>
+    </div>
+  </div>
+</section>
+ 
+<section id="services" class="wrap">
+  <div class="section-head">
+    <div class="eyebrow">Process</div>
+    <h2>Services</h2>
+    <p>From a quick diagnostic to a full board-level repair.</p>
+  </div>
+  <div class="services-list">
+    <div class="service-row">
+      <div class="left"><span class="num">01</span>
+        <svg viewBox="0 0 24 24" fill="none" stroke-width="1.8"><path d="M3 12h4l2-8 4 16 2-8h6"/></svg>
+        <div><div class="en">Diagnostics</div><div class="ka">დიაგნოსტიკა</div></div>
+      </div>
+    </div>
+    <div class="service-row">
+      <div class="left"><span class="num">02</span>
+        <svg viewBox="0 0 24 24" fill="none" stroke-width="1.8"><rect x="6" y="3" width="12" height="18" rx="2"/><path d="M6 8h12"/></svg>
+        <div><div class="en">Screen Replacement</div><div class="ka">ეკრანის შეცვლა</div></div>
+      </div>
+    </div>
+    <div class="service-row">
+      <div class="left"><span class="num">03</span>
+        <svg viewBox="0 0 24 24" fill="none" stroke-width="1.8"><rect x="7" y="7" width="9" height="13" rx="1.5"/><path d="M10 4h3v3h-3z"/></svg>
+        <div><div class="en">Battery Swap</div><div class="ka">ბატარეის შეცვლა</div></div>
+      </div>
+    </div>
+    <div class="service-row">
+      <div class="left"><span class="num">04</span>
+        <svg viewBox="0 0 24 24" fill="none" stroke-width="1.8"><path d="M13 2L4 14h6l-1 8 9-12h-6z"/></svg>
+        <div><div class="en">Charging Port</div><div class="ka">დამტენის პორტი</div></div>
+      </div>
+    </div>
+    <div class="service-row">
+      <div class="left"><span class="num">05</span>
+        <svg viewBox="0 0 24 24" fill="none" stroke-width="1.8"><rect x="4" y="4" width="16" height="16" rx="2"/><path d="M9 4v4M15 4v4M9 16v4M15 16v4M4 9h4M4 15h4M16 9h4M16 15h4"/></svg>
+        <div><div class="en">Motherboard Repair</div><div class="ka">დედაპლატის შეკეთება</div></div>
+      </div>
+    </div>
+    <div class="service-row" style="border-bottom:none;">
+      <div class="left"><span class="num">06</span>
+        <svg viewBox="0 0 24 24" fill="none" stroke-width="1.8"><rect x="3" y="11" width="18" height="10" rx="2"/><path d="M7 11V7a5 5 0 0110 0v4"/></svg>
+        <div><div class="en">Firmware / Unlock</div><div class="ka">პროგრამული განბლოკვა</div></div>
+      </div>
+    </div>
+  </div>
+</section>
+ 
+<section id="prices" class="wrap">
+  <div class="section-head">
+    <div class="eyebrow">Check price</div>
+    <h2>What will it cost?</h2>
+    <p>Select your device to see original and budget part pricing.</p>
+  </div>
+  <div class="checker">
+    <div class="checker-grid">
+      <div class="field">
+        <label>Manufacturer / მწარმოებელი</label>
+        <select id="mfr"><option>-- Select --</option><option>Apple</option><option>Samsung</option><option>Other Android</option></select>
+      </div>
+      <div class="field">
+        <label>Model / მოდელი</label>
+        <select id="model"><option>-- Select a manufacturer first --</option></select>
+      </div>
+      <div class="field">
+        <label>Part / ნაწილი</label>
+        <select id="part"><option>-- Select --</option><option>Screen</option><option>Battery</option><option>Charging Port</option></select>
+      </div>
+    </div>
+    <div class="price-result">
+      <div>
+        <div class="label">Original / ორიგინალი</div>
+        <div class="val">—</div>
+      </div>
+      <div>
+        <div class="label">Budget / ბიუჯეტური</div>
+        <div class="val">—</div>
+      </div>
+    </div>
+    <p class="price-note">Price includes replacement fee • ფასში შედის შეცვლის საფასურიც. Exact pricing coming soon — call or WhatsApp for a quote today.</p>
+  </div>
+</section>
+ 
+<section id="about" class="wrap">
+  <div class="about">
+    <div>
+      <div class="eyebrow">About us</div>
+      <h2>Your trusted partner for high-tech repairs</h2>
+      <p style="color:var(--text-muted); margin-top:16px; font-size:15.5px;">
+        UnitechService has spent years earning trust one repair at a time — honest diagnostics, fair pricing, and work we stand behind.
+        <span style="display:block;margin-top:8px;">სანდო და პროფესიონალური მომსახურება. გარანტია ყველა შეცვლილ დეტალზე.</span>
+      </p>
+    </div>
+    <div class="about-badges">
+      <div class="badge">
+        <svg viewBox="0 0 24 24" fill="none" stroke-width="1.8"><path d="M12 2l8 4v6c0 5-3.5 8.5-8 10-4.5-1.5-8-5-8-10V6z"/><path d="M9 12l2 2 4-4"/></svg>
+        <div><div class="t">Warranty on every part</div><div class="d">Every replacement is covered — original and budget parts alike.</div></div>
+      </div>
+      <div class="badge">
+        <svg viewBox="0 0 24 24" fill="none" stroke-width="1.8"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg>
+        <div><div class="t">Fast turnaround</div><div class="d">Most diagnostics and repairs completed same day.</div></div>
+      </div>
+      <div class="badge">
+        <svg viewBox="0 0 24 24" fill="none" stroke-width="1.8"><path d="M4 12l6 6L20 6"/></svg>
+        <div><div class="t">Honest diagnostics</div><div class="d">You'll know exactly what's wrong and what it costs before we start.</div></div>
+      </div>
+    </div>
+  </div>
+</section>
+ 
+<section id="contact" class="wrap">
+  <div class="section-head">
+    <div class="eyebrow">Get in touch</div>
+    <h2>Visit or contact us</h2>
+  </div>
+  <div class="contact-card">
+    <div>
+      <div class="contact-item">
+        <svg viewBox="0 0 24 24" fill="none" stroke-width="1.8"><path d="M21 10c0 6-9 12-9 12s-9-6-9-12a9 9 0 0118 0z"/><circle cx="12" cy="10" r="3"/></svg>
+        <div><div class="t">Address</div><div class="v">8 Kekelidze St, Tbilisi</div></div>
+      </div>
+      <div class="contact-item">
+        <svg viewBox="0 0 24 24" fill="none" stroke-width="1.8"><path d="M22 16.9v3a2 2 0 01-2.2 2 19.8 19.8 0 01-8.6-3 19.5 19.5 0 01-6-6 19.8 19.8 0 01-3-8.7A2 2 0 014.1 2h3a2 2 0 012 1.7c.1 1 .3 2 .7 3a2 2 0 01-.5 2.1L8 10a16 16 0 006 6l1.2-1.3a2 2 0 012.1-.5c1 .4 2 .6 3 .7a2 2 0 011.7 2z"/></svg>
+        <div><div class="t">Phone</div><div class="v"><a href="tel:+995597882088">597 88 20 88</a></div></div>
+      </div>
+    </div>
+    <div>
+      <div class="contact-item">
+        <svg viewBox="0 0 24 24" fill="none" stroke-width="1.8"><rect x="2" y="4" width="20" height="16" rx="2"/><path d="M2 6l10 7 10-7"/></svg>
+        <div><div class="t">Email</div><div class="v"><a href="mailto:unitechservice@hotmail.com">unitechservice@hotmail.com</a></div></div>
+      </div>
+      <div class="contact-item">
+        <svg viewBox="0 0 24 24" fill="none" stroke-width="1.8"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg>
+        <div><div class="t">Hours</div><div class="v">Mon–Fri 10:00–19:00<br>Sat 12:00–19:00</div></div>
+      </div>
+    </div>
+  </div>
+</section>
+ 
+<footer>
+  UnitechService — 8 Kekelidze St, Tbilisi &nbsp;·&nbsp; 597 88 20 88
+</footer>
+ 
+<script>
+  const models = {
+    "Apple": ["iPhone 13", "iPhone 14", "iPhone 15", "iPad Air", "MacBook Air"],
+    "Samsung": ["Galaxy S22", "Galaxy S23", "Galaxy S24", "Galaxy Tab S9"],
+    "Other Android": ["Xiaomi", "Huawei", "Google Pixel"]
+  };
+  const mfrSelect = document.getElementById('mfr');
+  const modelSelect = document.getElementById('model');
+  mfrSelect.addEventListener('change', () => {
+    const chosen = mfrSelect.value;
+    modelSelect.innerHTML = '';
+    if (models[chosen]) {
+      modelSelect.innerHTML = '<option>-- Select --</option>' + models[chosen].map(m => `<option>${m}</option>`).join('');
+    } else {
+      modelSelect.innerHTML = '<option>-- Select a manufacturer first --</option>';
+    }
+  });
+</script>
+ 
+</body>
+</html>
